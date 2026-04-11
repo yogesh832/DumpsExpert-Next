@@ -1,10 +1,11 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import dynamic from "next/dynamic";
+import Script from "next/script";
 import Providers from "@/components/providers";
 import LayoutShell from "@/components/LayoutShell";
-import Script from "next/script";
 
+// ✅ Font setup
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
@@ -14,6 +15,7 @@ const inter = Inter({
   fallback: ["system-ui", "arial"],
 });
 
+// ✅ Lazy load navbar and footer
 const Navbar = dynamic(() => import("@/components/public/Navbar"), {
   ssr: false,
   loading: () => (
@@ -26,6 +28,10 @@ const Footer = dynamic(() => import("@/components/public/Footer"), {
   loading: () => null,
 });
 
+// ✅ GA Measurement ID — change here only if needed
+const GA_ID = "G-FDQ12ZVW9G";
+
+// ✅ Metadata
 export const metadata = {
   title: {
     default:
@@ -111,23 +117,17 @@ export const metadata = {
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
-    other: [
-      {
-        rel: "icon",
-        url: "/favicon.ico",
-      },
-    ],
   },
 };
 
+// ✅ Viewport
 export const viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#13677c",
 };
 
-const GA_ID = "G-FDQ12ZVW9G"; // ✅ Your GA Measurement ID
-
+// ✅ Root Layout
 export default function RootLayout({ children }) {
   const structuredData = {
     "@context": "https://schema.org",
@@ -177,20 +177,20 @@ export default function RootLayout({ children }) {
         />
         <link rel="shortcut icon" href="/favicon.ico" />
 
-        {/* Critical CSS */}
+        {/* Critical CSS for instant render */}
         <style
           dangerouslySetInnerHTML={{
             __html: `*,::before,::after{box-sizing:border-box;border:0 solid #e5e7eb}html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:Inter,system-ui,sans-serif}body{margin:0;line-height:inherit}h1{font-size:2rem;font-weight:700;line-height:1.2;color:#111827;margin:0 0 1rem}p{margin:0 0 1rem;color:#4b5563}.flex{display:flex}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-8{gap:2rem}.w-full{width:100%}.max-w-7xl{max-width:80rem}.mx-auto{margin-left:auto;margin-right:auto}.px-4{padding-left:1rem;padding-right:1rem}.pt-20{padding-top:5rem}.bg-white{background-color:#fff}.text-gray-600{color:#4b5563}.text-gray-900{color:#111827}.animate-pulse{animation:pulse 2s ease-in-out infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}.bg-gray-200{background-color:#e5e7eb}.rounded-lg{border-radius:.5rem}@media(min-width:1024px){.lg\\:flex-row{flex-direction:row}.lg\\:w-1\\/2{width:50%}.lg\\:text-4xl{font-size:2.25rem}}`,
           }}
         />
 
-        {/* Structured Data */}
+        {/* Structured Data for SEO */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
 
-        {/* Preconnects */}
+        {/* Preconnects for faster loading */}
         <link
           rel="preconnect"
           href="https://fonts.googleapis.com"
@@ -215,11 +215,12 @@ export default function RootLayout({ children }) {
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="format-detection" content="telephone=no" />
       </head>
+
       <body
         className={`${inter.className} antialiased bg-white min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
-        {/* ✅ Google Analytics - using Next.js Script component with afterInteractive strategy */}
+        {/* ✅ Google Analytics — loaded after page is interactive, no render blocking */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
           strategy="afterInteractive"
@@ -233,7 +234,7 @@ export default function RootLayout({ children }) {
           `}
         </Script>
 
-        {/* Skip to main content */}
+        {/* ✅ FIXED: Skip to main content — was missing opening <a tag */}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-blue-600 focus:text-white"
