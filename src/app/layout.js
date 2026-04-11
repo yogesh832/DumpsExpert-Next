@@ -5,7 +5,6 @@ import Providers from "@/components/providers";
 import LayoutShell from "@/components/LayoutShell";
 import Script from "next/script";
 
-// ✅ Font setup with only essential weights
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
@@ -15,7 +14,6 @@ const inter = Inter({
   fallback: ["system-ui", "arial"],
 });
 
-// ✅ Lazy load navbar and footer for faster Speed Index
 const Navbar = dynamic(() => import("@/components/public/Navbar"), {
   ssr: false,
   loading: () => (
@@ -23,13 +21,11 @@ const Navbar = dynamic(() => import("@/components/public/Navbar"), {
   ),
 });
 
-// ✅ Lazy footer - Client side only for faster Speed Index
 const Footer = dynamic(() => import("@/components/public/Footer"), {
   ssr: false,
   loading: () => null,
 });
 
-// ✅ Metadata
 export const metadata = {
   title: {
     default:
@@ -38,7 +34,6 @@ export const metadata = {
   },
   description:
     "Pass your IT certifications in first attempt with trusted exam prep, practice tests & PDF guides by Prepmantras. AWS, SAP, Azure, CompTIA certification dumps with 99% pass rate.",
-
   keywords: [
     "IT certification",
     "exam prep",
@@ -51,22 +46,18 @@ export const metadata = {
     "exam questions",
     "certification training",
   ],
-
   authors: [{ name: "Prepmantras" }],
   creator: "Prepmantras",
   publisher: "Prepmantras",
   category: "Education",
   applicationName: "Prepmantras",
-
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_BASE_URL || "https://www.prepmantras.com",
   ),
-
   alternates: {
     canonical:
       process.env.NEXT_PUBLIC_BASE_URL || "https://www.prepmantras.com",
   },
-
   openGraph: {
     title: "Prepmantras – #1 IT Exam Prep Provider | 99% Pass Rate",
     description:
@@ -85,7 +76,6 @@ export const metadata = {
       },
     ],
   },
-
   twitter: {
     card: "summary_large_image",
     site: "@prepmantras",
@@ -95,7 +85,6 @@ export const metadata = {
       "Pass your IT certifications in first attempt with 99% pass rate. Trusted by 50,000+ students.",
     images: ["/og-image.png"],
   },
-
   robots: {
     index: true,
     follow: true,
@@ -107,13 +96,11 @@ export const metadata = {
       "max-snippet": -1,
     },
   },
-
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION,
     yandex: process.env.YANDEX_VERIFICATION,
     bing: process.env.BING_VERIFICATION,
   },
-
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -133,14 +120,14 @@ export const metadata = {
   },
 };
 
-// ✅ Viewport
 export const viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#13677c",
 };
 
-// ✅ Root Layout
+const GA_ID = "G-FDQ12ZVW9G"; // ✅ Your GA Measurement ID
+
 export default function RootLayout({ children }) {
   const structuredData = {
     "@context": "https://schema.org",
@@ -169,7 +156,7 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
     >
       <head>
-        {/* Favicon */}
+        {/* Favicons */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link
           rel="icon"
@@ -190,20 +177,20 @@ export default function RootLayout({ children }) {
         />
         <link rel="shortcut icon" href="/favicon.ico" />
 
-        {/* Critical CSS for instant render */}
+        {/* Critical CSS */}
         <style
           dangerouslySetInnerHTML={{
             __html: `*,::before,::after{box-sizing:border-box;border:0 solid #e5e7eb}html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:Inter,system-ui,sans-serif}body{margin:0;line-height:inherit}h1{font-size:2rem;font-weight:700;line-height:1.2;color:#111827;margin:0 0 1rem}p{margin:0 0 1rem;color:#4b5563}.flex{display:flex}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-8{gap:2rem}.w-full{width:100%}.max-w-7xl{max-width:80rem}.mx-auto{margin-left:auto;margin-right:auto}.px-4{padding-left:1rem;padding-right:1rem}.pt-20{padding-top:5rem}.bg-white{background-color:#fff}.text-gray-600{color:#4b5563}.text-gray-900{color:#111827}.animate-pulse{animation:pulse 2s ease-in-out infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}.bg-gray-200{background-color:#e5e7eb}.rounded-lg{border-radius:.5rem}@media(min-width:1024px){.lg\\:flex-row{flex-direction:row}.lg\\:w-1\\/2{width:50%}.lg\\:text-4xl{font-size:2.25rem}}`,
           }}
         />
 
-        {/* Structured Data for SEO */}
+        {/* Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
 
-        {/* Preconnect for faster font + GA loading */}
+        {/* Preconnects */}
         <link
           rel="preconnect"
           href="https://fonts.googleapis.com"
@@ -232,9 +219,9 @@ export default function RootLayout({ children }) {
         className={`${inter.className} antialiased bg-white min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
-        {/* ✅ Google Analytics - using built-in Script component (no extra package needed) */}
+        {/* ✅ Google Analytics - using Next.js Script component with afterInteractive strategy */}
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-FDQ12ZVW9G"
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -242,11 +229,11 @@ export default function RootLayout({ children }) {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-FDQ12ZVW9G');
+            gtag('config', '${GA_ID}');
           `}
         </Script>
 
-        {/* Skip to main content for accessibility */}
+        {/* Skip to main content */}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-blue-600 focus:text-white"
