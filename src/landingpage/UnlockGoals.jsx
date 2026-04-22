@@ -385,7 +385,7 @@ const WhyChooseSection = () => {
                     src={card.icon}
                     alt={card.title}
                     fill
-                    style={{ objectFit: "cover" }}
+                    style={{ objectFit: "contain", padding: "15px", backgroundColor: "#ffffff" }}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
                   <div className="wcs2-img-overlay" />

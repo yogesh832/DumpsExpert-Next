@@ -146,21 +146,28 @@ export async function GET(req) {
       let sortObj = {};
 
       if (sort === "popular") {
-        // Sort by newest/featured first (you can customize this logic)
         sortObj = { createdAt: -1 };
       } else {
         sortObj = { createdAt: -1 };
       }
 
-      const products = await Product.find()
+      // ✅ Build filter: apply category filter if provided
+      const categoryFilter = searchParams.get("category");
+      const filter = categoryFilter
+        ? { category: { $regex: new RegExp(`^${categoryFilter}$`, "i") } }
+        : {};
+
+      const products = await Product.find(filter)
         .sort(sortObj)
         .limit(limit)
         .select({
           _id: 1,
           title: 1,
           slug: 1,
+          category: 1,
           sapExamCode: 1,
           imageUrl: 1,
+          mainPdfUrl: 1,
           Description: 1,
           dumpsPriceInr: 1,
           dumpsPriceUsd: 1,
@@ -170,7 +177,7 @@ export async function GET(req) {
         })
         .lean();
 
-      console.log(`✅ Fetched ${products.length} products with limit ${limit}`);
+      console.log(`✅ Fetched ${products.length} products with limit ${limit}${categoryFilter ? ` (category: ${categoryFilter})` : ""}`);
 
       return NextResponse.json(
         {
@@ -244,7 +251,8 @@ export async function PUT(req) {
     await connectMongoDB();
 
     const data = await parseFormData(req);
-    const id = data._id;
+    const idFromQuery = new URL(req.url).searchParams.get("id");
+    const id = idFromQuery || data._id;
 
     if (!id) {
       return NextResponse.json(

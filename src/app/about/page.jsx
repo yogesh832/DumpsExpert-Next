@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
-import banner from "../../assets/aboutAssests/AboutBanner.png";
 import AboutContentSection from "./AboutContentSection";
+import { slugSegmentForUrl, categoryPathSegment } from "@/lib/productPaths";
 
 /* ---------------- PAGE ---------------- */
 export default function AboutUs() {
@@ -79,21 +79,20 @@ export default function AboutUs() {
   return (
     <>
       {/* ================= ABOUT SECTION ================= */}
-      <section className="min-h-screen flex items-center justify-center px-4">
-        <div className="flex flex-col lg:flex-row items-center gap-8 px-6 py-12 max-w-6xl w-full">
+      <section className="min-h-[70vh] flex items-center justify-center px-4">
+        <div className="flex flex-col lg:flex-row items-center gap-6 px-6 py-10 max-w-6xl w-full">
           <div className="lg:w-1/2 w-full">
-            <div className="relative w-full h-64 sm:h-80 md:h-96">
-              <Image
-                src={banner}
-                alt="About Prepmantras"
-                fill
-                priority
-                className="rounded-xl object-contain"
-              />
+            <div className="rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-800 p-10 sm:p-14 text-center text-white shadow-xl">
+              <p className="text-sm uppercase tracking-widest text-blue-100 mb-2">
+                PrepMantras
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-bold leading-tight">
+                Your partner for IT certification success
+              </h2>
             </div>
           </div>
 
-          <div className="lg:w-1/2 space-y-6">
+          <div className="lg:w-1/2 space-y-5">
             <h1 className="text-3xl font-bold text-gray-800">About Us</h1>
             <p className="text-gray-600">
               Prepmantras is your trusted destination for verified IT
@@ -132,26 +131,34 @@ export default function AboutUs() {
 
           {/* NAV */}
           <div className="flex justify-center gap-4 mb-8">
-            <button onClick={prev} className="slider-btn">
-              <ChevronLeft />
+            <button
+              type="button"
+              onClick={prev}
+              className="slider-btn bg-white hover:bg-orange-50"
+              aria-label="Previous products"
+            >
+              <ChevronLeft className="w-6 h-6 text-gray-800" strokeWidth={2.5} />
             </button>
             <button
+              type="button"
               onClick={next}
-              className="slider-btn bg-orange-500 text-white"
+              className="slider-btn bg-orange-500 hover:bg-orange-600 text-white"
+              aria-label="Next products"
             >
-              <ChevronRight />
+              <ChevronRight className="w-6 h-6 text-white" strokeWidth={2.5} />
             </button>
           </div>
 
           {/* SLIDER */}
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {visibleProducts.map((product) => {
-              const slug = encodeURIComponent(product.slug || product.title);
+              const cat = categoryPathSegment(product.category);
+              const slugSeg = slugSegmentForUrl(product.slug || product.title);
 
               return (
-                <a
+                <Link
                   key={product._id}
-                  href={`/itcertifications/sap/${slug}`}
+                  href={`/itcertifications/${cat}/${slugSeg}`}
                   className="group bg-white rounded-xl shadow-md hover:shadow-xl transition overflow-hidden flex flex-col"
                 >
                   <div className="relative h-52 bg-gradient-to-br from-orange-50 to-blue-50 overflow-hidden">
@@ -181,7 +188,7 @@ export default function AboutUs() {
                       ₹{product.dumpsPriceInr} / ${product.dumpsPriceUsd}
                     </p>
                   </div>
-                </a>
+                </Link>
               );
             })}
           </div>
@@ -208,11 +215,9 @@ export default function AboutUs() {
           border: 2px solid #f97316;
           padding: 0.6rem;
           border-radius: 9999px;
-          background: white;
           transition: 0.3s;
         }
         .slider-btn:hover {
-          background: #fff7ed;
           transform: scale(1.05);
         }
       `}</style>

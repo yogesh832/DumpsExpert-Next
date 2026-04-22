@@ -28,6 +28,12 @@ const Footer = dynamic(() => import("@/components/public/Footer"), {
   loading: () => null,
 });
 
+// ✅ Floating WhatsApp button (client-only)
+const WhatsAppButton = dynamic(
+  () => import("@/components/public/WhatsAppButton"),
+  { ssr: false },
+);
+
 // ✅ GA Measurement ID — change here only if needed
 const GA_ID = "G-FDQ12ZVW9G";
 
@@ -108,15 +114,8 @@ export const metadata = {
     bing: process.env.BING_VERIFICATION,
   },
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-    ],
+    icon: [{ url: "/favicon.ico", sizes: "any" }],
     shortcut: "/favicon.ico",
-    apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
   },
 };
 
@@ -143,9 +142,10 @@ export default function RootLayout({ children }) {
       email: "support@prepmantras.com",
     },
     sameAs: [
-      "https://www.facebook.com/prepmantras",
-      "https://twitter.com/prepmantras",
-      "https://www.linkedin.com/company/prepmantras",
+      "https://www.facebook.com/profile.php?id=61586933142451",
+      "https://www.linkedin.com/company/prepmantras/",
+      "https://www.instagram.com/prepmantras/",
+      "https://www.youtube.com/@Prepmantras",
     ],
   };
 
@@ -156,25 +156,7 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
     >
       <head>
-        {/* Favicons */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/favicon-16x16.png"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/apple-touch-icon.png"
-        />
         <link rel="shortcut icon" href="/favicon.ico" />
 
         {/* Critical CSS for instant render */}
@@ -246,6 +228,8 @@ export default function RootLayout({ children }) {
           <LayoutShell navbar={<Navbar />} footer={<Footer />}>
             {children}
           </LayoutShell>
+          {/* ✅ Global floating WhatsApp chat button */}
+          <WhatsAppButton />
         </Providers>
       </body>
     </html>

@@ -67,14 +67,20 @@ export default async function sitemap() {
   // Dynamic product URLs
   const productRoutes = products
     .filter((p) => p.slug && p.status === "active")
-    .map((product) => ({
-      url: `${baseUrl}/itcertifications/sap/${product.slug}`,
-      lastModified: product.updatedAt
-        ? new Date(product.updatedAt)
-        : new Date(),
-      changeFrequency: "weekly",
-      priority: 0.7,
-    }));
+    .map((product) => {
+      // ✅ Use dynamic category slug (e.g. salesforce, sap, aws)
+      const categorySlug = (product.category || "")
+        .toLowerCase()
+        .replace(/\s+/g, "-");
+      return {
+        url: `${baseUrl}/itcertifications/${categorySlug}/${product.slug}`,
+        lastModified: product.updatedAt
+          ? new Date(product.updatedAt)
+          : new Date(),
+        changeFrequency: "weekly",
+        priority: 0.7,
+      };
+    });
 
   // Dynamic blog URLs
   const blogRoutes = blogs

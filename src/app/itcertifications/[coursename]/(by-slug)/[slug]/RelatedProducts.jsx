@@ -11,16 +11,24 @@ import {
 } from "react-icons/fa";
 import { useCartStore } from "@/store/useCartStore";
 import { toast, Toaster } from "react-hot-toast";
+import { slugSegmentForUrl, categoryPathSegment } from "@/lib/productPaths";
 
-// Optimized fetch with no cache for real-time updates
-async function fetchAllProducts(limit = 12) {
+// ✅ Fetch products filtered by category directly from API
+async function fetchProductsByCategory(category, limit = 20) {
   try {
-    const response = await fetch(`/api/products?limit=${limit}`, {
-      cache: "no-store",
-      headers: {
-        "Cache-Control": "no-cache, no-store, must-revalidate",
+    // Build URL with category filter if available
+    const categoryParam = category
+      ? `&category=${encodeURIComponent(category)}`
+      : "";
+    const response = await fetch(
+      `/api/products?limit=${limit}${categoryParam}`,
+      {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+        },
       },
-    });
+    );
 
     if (!response.ok) return [];
 
@@ -83,12 +91,10 @@ const ProductCard = memo(
     const isAvailable = useMemo(() => isProductAvailable(product), [product]);
 
     const discount = useMemo(() => {
-      if (product.dumpsMrpInr > product.dumpsPriceInr) {
-        return Math.round(
-          ((product.dumpsMrpInr - product.dumpsPriceInr) /
-            product.dumpsMrpInr) *
-            100,
-        );
+      const mrp = toNum(product.dumpsMrpInr);
+      const sale = toNum(product.dumpsPriceInr);
+      if (mrp > sale && mrp > 0) {
+        return Math.round(((mrp - sale) / mrp) * 100);
       }
       return 0;
     }, [product.dumpsMrpInr, product.dumpsPriceInr]);
@@ -140,60 +146,54 @@ const ProductCard = memo(
               </p>
             ) : (
               <>
-                <p className="text-xl font-bold text-orange-500">
-                  ₹{product.dumpsPriceInr}
-                </p>
-                {product.dumpsMrpInr > product.dumpsPriceInr && (
+                {toNum(product.dumpsPriceInr) > 0 ||
+                toNum(product.dumpsPriceUsd) > 0 ? (
                   <>
-                    <p className="text-sm text-gray-500 line-through">
-                      ₹{product.dumpsMrpInr}
-                    </p>
-                    <span className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">
-                      {discount}% OFF
-                    </span>
+                    <div className="flex flex-wrap items-baseline gap-2">
+                      {toNum(product.dumpsPriceInr) > 0 && (
+                        <p className="text-xl font-bold text-orange-500">
+                          ₹{product.dumpsPriceInr}
+                        </p>
+                      )}
+                      {toNum(product.dumpsPriceUsd) > 0 && (
+                        <p className="text-sm font-semibold text-gray-600">
+                          ${product.dumpsPriceUsd}
+                        </p>
+                      )}
+                    </div>
+                    {toNum(product.dumpsMrpInr) >
+                      toNum(product.dumpsPriceInr) &&
+                      toNum(product.dumpsPriceInr) > 0 && (
+                      <>
+                        <p className="text-sm text-gray-500 line-through">
+                          ₹{product.dumpsMrpInr}
+                        </p>
+                        {discount > 0 && (
+                          <span className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">
+                            {discount}% OFF
+                          </span>
+                        )}
+                      </>
+                    )}
                   </>
+                ) : (
+                  <p className="text-sm font-semibold text-gray-600">
+                    See details for pricing
+                  </p>
                 )}
               </>
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="mt-auto space-y-2.5">
+          {/* Action Buttons - Only View Details */}
+          <div className="mt-auto">
             <button
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
               onClick={handleViewClick}
             >
-              <FaEye className="text-sm" />
+              <FaEye className="text-sm w-3.5 h-3.5 flex-shrink-0" />
               View Details
             </button>
-
-            {product.showWpConnect ? (
-              <a
-                href={`https://wa.me/9871952577?text=Hi%2C%20I'm%20interested%20in%20${encodeURIComponent(product.title || product.sapExamCode)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
-                Inquire on WhatsApp
-              </a>
-            ) : (
-              <button
-                className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors shadow-sm ${
-                  isAvailable
-                    ? "bg-orange-500 hover:bg-orange-600 text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-                onClick={handleAddClick}
-                disabled={!isAvailable}
-              >
-                <FaShoppingCart className="text-sm" />
-                {isAvailable ? "Add to Cart" : "Unavailable"}
-              </button>
-            )}
           </div>
         </div>
       </div>
@@ -203,7 +203,11 @@ const ProductCard = memo(
 
 ProductCard.displayName = "ProductCard";
 
-export default function RelatedProducts({ currentSlug, maxProducts = 10 }) {
+export default function RelatedProducts({
+  currentSlug,
+  currentCategory,
+  maxProducts = 10,
+}) {
   const router = useRouter();
   const scrollContainerRef = useRef(null);
   const autoScrollIntervalRef = useRef(null);
@@ -290,9 +294,9 @@ export default function RelatedProducts({ currentSlug, maxProducts = 10 }) {
   // View details handler with useCallback
   const handleViewDetails = useCallback(
     (product) => {
-      router.push(
-        `/itcertifications/${product.category || "sap"}/${product.slug}`,
-      );
+      const cat = categoryPathSegment(product.category);
+      const seg = slugSegmentForUrl(product.slug);
+      router.push(`/itcertifications/${cat}/${seg}`);
     },
     [router],
   );
@@ -303,12 +307,23 @@ export default function RelatedProducts({ currentSlug, maxProducts = 10 }) {
 
     async function loadProducts() {
       setIsLoading(true);
-      const allProducts = await fetchAllProducts(maxProducts + 5);
+
+      // ✅ Pass category to API so we get same-category products directly
+      const allProducts = await fetchProductsByCategory(
+        currentCategory,
+        maxProducts + 5,
+      );
 
       if (!isMounted) return;
 
+      const catNorm = (currentCategory || "").trim().toLowerCase();
       const filtered = allProducts
-        .filter((p) => p.slug !== currentSlug)
+        .filter((p) => {
+          if (!p.slug || p.slug === currentSlug) return false;
+          if (!catNorm) return true;
+          // ✅ Safety net: client-side category check too
+          return (p.category || "").trim().toLowerCase() === catNorm;
+        })
         .slice(0, maxProducts);
       setRelatedProducts(filtered);
       setIsLoading(false);
@@ -321,7 +336,7 @@ export default function RelatedProducts({ currentSlug, maxProducts = 10 }) {
     return () => {
       isMounted = false;
     };
-  }, [currentSlug, maxProducts]);
+  }, [currentSlug, currentCategory, maxProducts]);
 
   const checkScrollButtons = useCallback(() => {
     if (scrollContainerRef.current) {

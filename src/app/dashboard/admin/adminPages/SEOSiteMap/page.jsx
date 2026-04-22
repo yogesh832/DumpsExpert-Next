@@ -6,6 +6,7 @@ const SEOSiteMap = () => {
   const [file, setFile] = useState(null);
   const [sitemaps, setSitemaps] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [pinging, setPinging] = useState(false);
   const [analyzing, setAnalyzing] = useState(null);
   const [previewData, setPreviewData] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -146,6 +147,25 @@ const SEOSiteMap = () => {
     }
   };
 
+  const handlePingLiveSitemap = async () => {
+    setPinging(true);
+    try {
+      const res = await fetch("/api/seo/ping-sitemap", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.message || "Ping failed");
+        return;
+      }
+      alert(
+        `Submitted sitemap to search engines.\n\n${data.sitemapUrl}\n\nCheck results in server logs or Search Console.`,
+      );
+    } catch (e) {
+      alert(e.message || "Ping failed");
+    } finally {
+      setPinging(false);
+    }
+  };
+
   // Format file size
   const formatFileSize = (bytes) => {
     if (!bytes) return 'N/A';
@@ -161,6 +181,22 @@ const SEOSiteMap = () => {
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">SEO Sitemap Manager</h1>
           <p className="text-gray-600">Upload, manage, and analyze your XML sitemaps for better SEO</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={handlePingLiveSitemap}
+              disabled={pinging}
+              className={`rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors ${
+                pinging ? "bg-gray-400" : "bg-emerald-600 hover:bg-emerald-700"
+              }`}
+            >
+              {pinging ? "Submitting…" : "Submit live sitemap (Google + Bing)"}
+            </button>
+            <p className="text-sm text-gray-500 max-w-xl">
+              Uses your site&apos;s <code className="bg-gray-100 px-1 rounded">/sitemap.xml</code> from{" "}
+              <code className="bg-gray-100 px-1 rounded">NEXT_PUBLIC_BASE_URL</code>. No XML file required.
+            </p>
+          </div>
         </div>
 
         {/* Upload Form */}

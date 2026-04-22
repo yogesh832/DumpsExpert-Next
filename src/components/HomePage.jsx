@@ -199,7 +199,7 @@ export default function HomePage({
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const hasDataIssues = dumps.length === 0 || blogs.length === 0 || faqs.length === 0;
+  const hasDataIssues = dumps.length === 0  || faqs.length === 0;
 
   if (!mounted || isInitialLoad) {
     return (

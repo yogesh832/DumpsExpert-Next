@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import Breadcrumbs from "@/components/public/Breadcrumbs";
-import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 import ProductsList from "./ProductsList";
 
 // Enable ISR for better performance
@@ -13,7 +12,7 @@ export const revalidate = 0; // Real-time updates - no caching
    =========================== */
 async function fetchCategoryData(coursename) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.prepmantras.com";
 
     console.log("🔍 Fetching from:", `${baseUrl}/api/products`);
 
@@ -100,11 +99,21 @@ async function fetchCategoryData(coursename) {
         c.name?.toLowerCase() === coursename.toLowerCase(),
     );
 
-    const categoryProducts = products.filter(
-      (p) =>
-        p.category?.toLowerCase().replace(/\s+/g, "-") ===
-        coursename.toLowerCase(),
-    );
+    const categoryLabel = matchedCategory?.name?.trim();
+    const routeKey = coursename.toLowerCase();
+
+    const categoryProducts = products.filter((p) => {
+      const raw = (p.category || "").trim();
+      if (!raw) return false;
+      const lower = raw.toLowerCase();
+      const slugified = lower.replace(/\s+/g, "-");
+      if (categoryLabel) {
+        return lower === categoryLabel.toLowerCase();
+      }
+      return (
+        slugified === routeKey || lower === routeKey.replace(/-/g, " ")
+      );
+    });
     console.log("✅ Matched category:", matchedCategory?.name);
     console.log("✅ Filtered products:", categoryProducts.length);
 
@@ -310,22 +319,9 @@ export default async function CategoryPage({ params, searchParams }) {
 
             {/* ✅ Bottom Category Description - Compact */}
             {category && category.descriptionBelow && (
-              <div className="my-5 sm:my-6 md:my-7 shadow-md rounded-xl border border-gray-200 p-3.5 sm:p-4 md:p-5 bg-white">
-                {category.image && (
-                  <div className="relative w-full h-36 sm:h-44 md:h-56 lg:h-64 mb-3 sm:mb-4">
-                    <ImageWithSkeleton
-                      src={category.image}
-                      alt={category.name}
-                      fill
-                      className="object-contain rounded-lg shadow"
-                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, 800px"
-                      quality={75}
-                      skeletonClassName="rounded-lg md:rounded-xl"
-                    />
-                  </div>
-                )}
+              <div className="my-4 sm:my-5 md:my-6 shadow-md rounded-xl border border-gray-200 p-3 sm:p-4 md:p-5 bg-white">
                 <div
-                  className="prose prose-sm sm:prose-base max-w-none text-gray-700 [&>*]:mb-2 [&>*]:sm:mb-2.5 [&>*:last-child]:mb-0 [&>h1]:text-lg [&>h1]:sm:text-xl [&>h1]:md:text-2xl [&>h2]:text-base [&>h2]:sm:text-lg [&>h2]:md:text-xl [&>h3]:text-sm [&>h3]:sm:text-base [&>h3]:md:text-lg [&>p]:text-[13px] [&>p]:sm:text-sm [&>p]:md:text-base [&>p]:leading-relaxed"
+                  className="prose prose-sm sm:prose-base max-w-none text-gray-700 [&>*]:mb-1.5 [&>*]:sm:mb-2 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&>h1]:text-lg [&>h1]:sm:text-xl [&>h1]:md:text-2xl [&>h2]:text-base [&>h2]:sm:text-lg [&>h2]:md:text-xl [&>h3]:text-sm [&>h3]:sm:text-base [&>h3]:md:text-lg [&>p]:text-[13px] [&>p]:sm:text-sm [&>p]:md:text-base [&>p]:leading-relaxed"
                   dangerouslySetInnerHTML={{
                     __html: category.descriptionBelow,
                   }}

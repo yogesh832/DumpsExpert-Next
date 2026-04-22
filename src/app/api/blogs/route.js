@@ -77,22 +77,51 @@ export async function POST(request) {
       imagePublicId = uploadResult?.public_id || "";
     }
 
-    const blogData = {
-      title: formData.get("title"),
-      content: formData.get("content"),
-      category: formData.get("category"),
-      slug: formData.get("slug"),
+    const title = (formData.get("title") || "").toString().trim() || "Untitled";
+    const content =
+      (formData.get("content") || "").toString().trim() ||
+      "<p>No content yet.</p>";
+    const slugRaw = (formData.get("slug") || "").toString().trim();
+    const slug =
+      slugRaw ||
+      title
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
+        .slice(0, 120);
 
-      imageUrl,
+    const metaTitle =
+      (formData.get("metaTitle") || "").toString().trim() || title;
+    const metaKeywords =
+      (formData.get("metaKeywords") || "").toString().trim() || title;
+    const metaDescription =
+      (formData.get("metaDescription") || "").toString().trim() ||
+      title.slice(0, 160);
+
+    let schemaRaw = (formData.get("schema") || "").toString().trim();
+    if (!schemaRaw) schemaRaw = "{}";
+    try {
+      JSON.parse(schemaRaw);
+    } catch {
+      schemaRaw = "{}";
+    }
+
+    const blogData = {
+      title,
+      content,
+      category: formData.get("category"),
+      slug,
+
+      imageUrl: imageUrl || "/og-image.png",
       imagePublicId,
 
-      status: formData.get("status"),
+      status: formData.get("status") || "unpublish",
 
-      metaTitle: formData.get("metaTitle"),
-      metaKeywords: formData.get("metaKeywords"),
-      metaDescription: formData.get("metaDescription"),
+      metaTitle,
+      metaKeywords,
+      metaDescription,
 
-      schema: formData.get("schema"),
+      schema: schemaRaw,
     };
 
     const blog = await Blog.create(blogData);
@@ -103,6 +132,12 @@ export async function POST(request) {
     );
   } catch (error) {
     console.error("❌ POST /api/blogs error:", error);
+    if (error.code === 11000) {
+      return NextResponse.json(
+        { error: "This slug is already in use. Choose a different slug." },
+        { status: 409 },
+      );
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

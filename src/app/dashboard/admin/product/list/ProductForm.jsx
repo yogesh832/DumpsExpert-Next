@@ -117,12 +117,12 @@ const ProductForm = ({ mode }) => {
       return;
     }
 
-    // Auto-convert slug: spaces to hyphens, uppercase to lowercase
+    // Slug: allow letters, numbers, common URL-safe symbols (no spaces)
     if (name === "slug") {
       const formattedSlug = value
         .toLowerCase()
         .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9-]/g, ""); // Remove special characters except hyphens
+        .replace(/[^a-z0-9._~(),%-]/g, "");
       setForm((prev) => ({ ...prev, [name]: formattedSlug }));
     } else if (name === "sapExamCode") {
       // Auto-fill examCode when sapExamCode is filled
@@ -162,6 +162,10 @@ const ProductForm = ({ mode }) => {
     setLoading(true);
 
     const formData = new FormData();
+
+    if (mode === "edit" && id) {
+      formData.append("_id", id);
+    }
 
     Object.keys(form).forEach((key) => {
       if (key !== "image" && key !== "samplePdf" && key !== "mainPdf") {

@@ -10,7 +10,6 @@ import {
   FaLinkedinIn,
   FaYoutube,
 } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
 import contactImg from "@/assets/contactAssets/image.png";
 // ✅ Lazy load these components to avoid build-time issues
 const ContactDataFirst = dynamic(
@@ -109,22 +108,19 @@ const Contact = () => {
           </p>
 
           <div className="flex gap-5 text-3xl text-[#555]">
-            <Link href="https://dumpsxpert.com/contact" target="_blank">
+            <Link href="https://www.facebook.com/profile.php?id=61586933142451" target="_blank">
               <FaFacebook />
             </Link>
-            <Link href="https://x.com/DumpsXpert" target="_blank">
-              <FaXTwitter />
-            </Link>
             <Link
-              href="https://www.linkedin.com/company/dumpsxpert/"
+              href="https://www.linkedin.com/company/prepmantras/"
               target="_blank"
             >
               <FaLinkedinIn />
             </Link>
-            <Link href="https://dumpsxpert.com/contact" target="_blank">
+            <Link href="https://www.instagram.com/prepmantras/" target="_blank">
               <FaInstagram />
             </Link>
-            <Link href="https://www.youtube.com/@DumpsXpert" target="_blank">
+            <Link href="https://www.youtube.com/@Prepmantras" target="_blank">
               <FaYoutube />
             </Link>
           </div>

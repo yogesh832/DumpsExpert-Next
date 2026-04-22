@@ -97,13 +97,17 @@ export default function Breadcrumbs() {
                   <BreadcrumbLink asChild>
                     <Link
                       href={buildHref(index)}
-                      className={`capitalize transition-colors text-xs sm:text-sm max-w-[200px] sm:max-w-[300px] md:max-w-none overflow-hidden whitespace-nowrap text-ellipsis inline-block ${
+                      className={`transition-colors text-xs sm:text-sm max-w-[200px] sm:max-w-[300px] md:max-w-none overflow-hidden whitespace-nowrap text-ellipsis inline-block ${
                         index === segments.length - 1
                           ? "text-gray-900 font-medium"
-                          : "text-gray-600 hover:text-gray-900"
+                          : "text-gray-600 hover:text-gray-900 capitalize"
                       }`}
                     >
-                      {decodeURIComponent(segment.replace(/-/g, " "))}
+                      {/* ✅ Last segment = product slug → show uppercase with hyphens (e.g. C-ARCIG-2601)
+                          Other segments = category name → replace hyphens with spaces (e.g. "it certifications") */}
+                      {index === segments.length - 1
+                        ? decodeURIComponent(segment).toUpperCase()
+                        : decodeURIComponent(segment.replace(/-/g, " "))}
                     </Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>

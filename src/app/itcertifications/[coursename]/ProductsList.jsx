@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { slugSegmentForUrl } from "@/lib/productPaths";
 
 export default function ProductsList({ products, coursename }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -10,8 +11,30 @@ export default function ProductsList({ products, coursename }) {
   // ✅ Price formatter with thousand grouping
   const formatPrice = (value, symbol = "₹") => {
     const num = Number((value || "").toString().replace(/[,\s]/g, ""));
-    if (!Number.isFinite(num)) return "NA";
+    if (!Number.isFinite(num) || num <= 0) return "—";
     return `${symbol}${num.toLocaleString("en-IN")}`;
+  };
+
+  const productHref = (product) =>
+    `/itcertifications/${coursename}/${slugSegmentForUrl(product.slug)}`;
+
+  const copyTableWithLinks = async () => {
+    if (typeof window === "undefined" || !products.length) return;
+    const origin = window.location.origin;
+    const lines = [
+      `Exam code\tName\tProduct URL`,
+      ...products.map((p) => {
+        const code = (p.sapExamCode || "").replace(/\t/g, " ");
+        const title = (p.title || "").replace(/\t|\r|\n/g, " ");
+        return `${code}\t${title}\t${origin}${productHref(p)}`;
+      }),
+    ];
+    try {
+      await navigator.clipboard.writeText(lines.join("\n"));
+      alert("Copied table with full URLs. Paste into Excel or Sheets.");
+    } catch {
+      alert("Could not copy. Select the table manually or try HTTPS.");
+    }
   };
 
   useEffect(() => {
@@ -47,12 +70,8 @@ export default function ProductsList({ products, coursename }) {
         {products.map((product) => (
           <div
             key={product._id}
-            className="group relative w-full bg-gradient-to-br from-white via-white to-gray-50 rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-5 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden"
+            className="group relative w-full bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-5 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden"
           >
-            {/* Decorative Background Elements */}
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-50 to-transparent rounded-bl-full opacity-50"></div>
-            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-orange-50 to-transparent rounded-tr-full opacity-50"></div>
-
             {/* Content */}
             <div className="relative z-10">
               {/* Exam Code Badge */}
@@ -98,7 +117,7 @@ export default function ProductsList({ products, coursename }) {
                     </p>
                     <div className="flex items-center justify-center gap-2 mb-1">
                       <span className="text-lg font-bold text-green-600">
-                        {formatPrice(product.dumpsPriceInr?.trim(), "₹")}
+                        {formatPrice(product.dumpsPriceInr, "₹")}
                       </span>
                       <span className="text-xs text-gray-500 font-medium">
                         {formatPrice(product.dumpsPriceUsd, "$")}
@@ -106,7 +125,7 @@ export default function ProductsList({ products, coursename }) {
                     </div>
                     {product.dumpsMrpInr && (
                       <p className="text-xs line-through text-gray-400">
-                        MRP: {formatPrice(product.dumpsMrpInr?.trim(), "₹")}
+                        MRP: {formatPrice(product.dumpsMrpInr, "₹")}
                       </p>
                     )}
                   </div>
@@ -116,7 +135,7 @@ export default function ProductsList({ products, coursename }) {
               {/* CTA Button */}
               <div className="w-full">
                 <Link
-                  href={`/itcertifications/${coursename}/${product.slug}`}
+                  href={productHref(product)}
                   className="block w-full bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 hover:from-orange-600 hover:via-red-600 hover:to-red-600 text-white text-sm font-bold text-center py-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95"
                 >
                   <span className="flex items-center justify-center gap-2">
@@ -147,6 +166,15 @@ export default function ProductsList({ products, coursename }) {
   // Desktop Table View
   return (
     <div className="overflow-x-auto shadow-md rounded-xl border border-gray-200 bg-white">
+      <div className="flex justify-end px-3 py-2 border-b border-gray-100 bg-gray-50">
+        <button
+          type="button"
+          onClick={copyTableWithLinks}
+          className="text-xs sm:text-sm font-semibold text-blue-700 hover:text-blue-900 underline"
+        >
+          Copy table (exam codes + full product links)
+        </button>
+      </div>
       <table className="min-w-full text-left text-gray-800 text-sm">
         <thead className="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 uppercase text-xs">
           <tr>
@@ -165,7 +193,12 @@ export default function ProductsList({ products, coursename }) {
               className="border-t border-gray-100 hover:bg-blue-50 transition-colors"
             >
               <td className="px-4 py-3 font-semibold text-blue-700 whitespace-nowrap">
-                {product.sapExamCode}
+                <Link
+                  href={productHref(product)}
+                  className="text-blue-700 hover:underline"
+                >
+                  {product.sapExamCode}
+                </Link>
               </td>
               <td className="px-4 py-3 align-top">
                 <span className="line-clamp-2">{product.title}</span>
@@ -182,14 +215,14 @@ Contact for Best Price
                   </span>
                 ) : (
                   <span className="block font-bold gap-1 text-green-600 text-base">
-                    {formatPrice(product.dumpsPriceInr?.trim(), "₹")} /
+                    {formatPrice(product.dumpsPriceInr, "₹")} /
                     {formatPrice(product.dumpsPriceUsd, "$")}
                   </span>
                 )}
               </td>
               <td className="px-4 py-3 text-center">
                 <Link
-                  href={`/itcertifications/${coursename}/${product.slug}`}
+                  href={productHref(product)}
                   className="inline-block bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-5 py-2 rounded-lg shadow-sm font-semibold transition-all text-xs hover:shadow-md"
                 >
                   See Details

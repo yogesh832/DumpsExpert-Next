@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
+import { FaFacebookF, FaLinkedinIn, FaPinterestP } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 const BlogDetail = ({ slug }) => {
   const [blog, setBlog] = useState(null);
   const [recentBlogs, setRecentBlogs] = useState([]);
   const [categoryName, setCategoryName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [shareUrl, setShareUrl] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setShareUrl(window.location.href);
+    }
+  }, [slug]);
 
   useEffect(() => {
     if (!slug) return;
@@ -34,14 +42,23 @@ const BlogDetail = ({ slug }) => {
         if (blogData?.data) {
           setBlog(blogData.data);
 
-          // ✅ Fetch category name if needed (in parallel with setting state)
-          if (blogData.data.category) {
-            fetch(`/api/blog-categories/${blogData.data.category}`, {
-              next: { revalidate: 60 }, // Cache categories for 1 minute
+          const cat = blogData.data.category;
+          const catId =
+            cat && typeof cat === "object" && cat._id != null
+              ? cat._id
+              : cat;
+
+          if (catId) {
+            fetch(`/api/blog-categories/${catId}`, {
+              next: { revalidate: 60 },
             })
               .then((res) => res.json())
               .then((data) => {
-                if (data?.data?.name) {
+                if (data?.data?.category) {
+                  setCategoryName(data.data.category);
+                } else if (data?.data?.sectionName) {
+                  setCategoryName(data.data.sectionName);
+                } else if (data?.data?.name) {
                   setCategoryName(data.data.name);
                 }
               })
@@ -187,12 +204,10 @@ const BlogDetail = ({ slug }) => {
         </div>
       </div>
 
-      {/* Main Content - Responsive */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-          {/* Blog Content */}
-          <div className="lg:col-span-2">
-            <article className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 lg:p-12">
+      {/* Main Content — full-width article; sidebar below on all breakpoints */}
+      <div className="max-w-5xl mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12 w-full">
+        <div className="flex flex-col gap-8">
+          <article className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 lg:p-12 w-full max-w-none">
               {blog.metaDescription && (
                 <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-blue-50 border-l-4 border-blue-600 rounded-r-lg">
                   <p className="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed italic">
@@ -202,11 +217,12 @@ const BlogDetail = ({ slug }) => {
               )}
 
               <div
-                className="prose prose-sm sm:prose-base lg:prose-lg max-w-none text-gray-800
+                className="prose prose-sm sm:prose-base lg:prose-lg max-w-none text-gray-800 w-full
                   prose-headings:text-gray-900 prose-headings:font-bold
-                  prose-h1:text-xl sm:prose-h1:text-2xl md:prose-h1:text-3xl
-                  prose-h2:text-lg sm:prose-h2:text-xl md:prose-h2:text-2xl
-                  prose-h3:text-base sm:prose-h3:text-lg md:prose-h3:text-xl
+                  prose-h1:text-2xl sm:prose-h1:text-3xl md:prose-h1:text-4xl
+                  prose-h2:text-xl sm:prose-h2:text-2xl md:prose-h2:text-3xl
+                  prose-h3:text-lg sm:prose-h3:text-xl md:prose-h3:text-2xl
+                  prose-h4:text-base sm:prose-h4:text-lg
                   prose-p:leading-relaxed prose-p:text-gray-700 prose-p:text-sm sm:prose-p:text-base
                   prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-a:break-words
                   prose-strong:text-gray-900 prose-strong:font-semibold
@@ -223,8 +239,53 @@ const BlogDetail = ({ slug }) => {
                 }}
               />
 
-              {/* Share & Back Button - Responsive */}
-              <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <p className="text-sm font-semibold text-gray-700 mb-3">
+                  Share this article
+                </p>
+                <div className="flex flex-wrap gap-2 sm:gap-3">
+                  {shareUrl ? (
+                    <>
+                      <a
+                        href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg bg-[#1877F2] px-3 py-2 text-sm font-semibold text-white hover:opacity-95"
+                      >
+                        <FaFacebookF /> Facebook
+                      </a>
+                      <a
+                        href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(blog.title || "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg bg-black px-3 py-2 text-sm font-semibold text-white hover:opacity-90"
+                      >
+                        <FaXTwitter /> X
+                      </a>
+                      <a
+                        href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg bg-[#0A66C2] px-3 py-2 text-sm font-semibold text-white hover:opacity-95"
+                      >
+                        <FaLinkedinIn /> LinkedIn
+                      </a>
+                      <a
+                        href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&description=${encodeURIComponent(blog.title || "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg bg-[#E60023] px-3 py-2 text-sm font-semibold text-white hover:opacity-95"
+                      >
+                        <FaPinterestP /> Pinterest
+                      </a>
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-500">Loading share links…</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <Link
                   href="/blogs"
                   className="inline-flex items-center px-5 sm:px-6 py-2.5 sm:py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-full transition-colors text-sm sm:text-base w-full sm:w-auto justify-center"
@@ -244,28 +305,10 @@ const BlogDetail = ({ slug }) => {
                   </svg>
                   Back to Blogs
                 </Link>
-                <div className="flex items-center gap-2 text-gray-500 text-xs sm:text-sm">
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <span>5 min read</span>
-                </div>
               </div>
-            </article>
-          </div>
+          </article>
 
-          {/* Sidebar - Responsive */}
-          <div className="lg:col-span-1">
+          <div className="w-full max-w-5xl mx-auto">
             <div className="lg:sticky lg:top-6 space-y-4 sm:space-y-6">
               {/* Related Blogs */}
               {recentBlogs.length > 0 && (

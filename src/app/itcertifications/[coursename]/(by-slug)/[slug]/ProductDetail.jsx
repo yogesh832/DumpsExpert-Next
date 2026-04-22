@@ -468,7 +468,16 @@ export default function ProductDetailsPage() {
         }
 
         const allProducts = await fetchAllProducts();
-        setRelatedProducts(allProducts.filter((p) => p.slug !== slug));
+        const catKey = (productData?.category || "").toLowerCase().trim();
+        setRelatedProducts(
+          allProducts.filter(
+            (p) =>
+              p.slug &&
+              p.slug !== slug &&
+              (!catKey ||
+                (p.category || "").toLowerCase().trim() === catKey),
+          ),
+        );
       } catch (err) {
         console.error("❌ Error loading data:", err);
         setIsLoadingExams(false);
@@ -613,22 +622,25 @@ export default function ProductDetailsPage() {
           </h1>
 
           {/* Exam Information Table - COMPACT VERSION (50% height reduction) */}
-          {(product.examCode ||
+          {!!(
+            product.examCode ||
+            product.sapExamCode ||
             product.examName ||
-            product.totalQuestions ||
+            Number(product.totalQuestions) > 0 ||
             product.passingScore ||
             product.duration ||
-            product.examLastUpdated) && (
+            product.examLastUpdated
+          ) && (
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <table className="w-full border-collapse">
                 <tbody className="divide-y divide-gray-200">
-                  {product.examCode && (
+                  {(product.examCode || product.sapExamCode) && (
                     <tr className="hover:bg-gray-50 transition-colors">
                       <td className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-[10px] sm:text-[11px] md:text-xs font-semibold text-gray-700 bg-gray-50 w-[35%] sm:w-[30%]">
                         Exam Code
                       </td>
                       <td className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-[10px] sm:text-[11px] md:text-xs text-gray-900">
-                        {product.examCode}
+                        {product.examCode || product.sapExamCode}
                       </td>
                     </tr>
                   )}
@@ -644,7 +656,7 @@ export default function ProductDetailsPage() {
                     </tr>
                   )}
 
-                  {product.totalQuestions && (
+                  {Number(product.totalQuestions) > 0 && (
                     <tr className="hover:bg-gray-50 transition-colors">
                       <td className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-[10px] sm:text-[11px] md:text-xs font-semibold text-gray-700 bg-gray-50 w-[35%] sm:w-[30%]">
                         Total Questions
@@ -690,7 +702,7 @@ export default function ProductDetailsPage() {
                     </td>
                   </tr>
 
-                  {avgRating && avgRating > 0 && (
+                  {!!avgRating && avgRating > 0 && (
                     <tr className="hover:bg-gray-50 transition-colors">
                       <td className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-[10px] sm:text-[11px] md:text-xs font-semibold text-gray-700 bg-gray-50 w-[35%] sm:w-[30%]">
                         Rating
@@ -776,7 +788,7 @@ export default function ProductDetailsPage() {
                         className="flex-1 min-w-[180px] lg:min-w-[200px] flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 lg:px-5 py-1.5 sm:py-2 rounded bg-slate-700 hover:bg-slate-800 text-white font-medium text-[10px] sm:text-xs uppercase transition-colors whitespace-nowrap text-center"
                         style={{ maxWidth: "100%" }}
                       >
-                        <FaEye size={14} className="sm:w-4 sm:h-4 w-6" />
+                        <FaEye size={14} className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
                         TRY ONLINE EXAM
                       </button>
                       <button
@@ -793,7 +805,7 @@ export default function ProductDetailsPage() {
               )}
 
               {/* PDF Downloadable Format */}
-              {pdfPrices && (pdfPrices.priceInr || pdfPrices.priceUsd) && (
+              {pdfPrices && (pdfPrices.priceInr > 0 || pdfPrices.priceUsd > 0) && (
                 <div
                   className={`px-2 sm:px-4 lg:px-6 py-2.5 sm:py-3 lg:py-3.5 ${
                     !productAvailable ? "bg-gray-50 opacity-70" : ""
@@ -840,7 +852,10 @@ export default function ProductDetailsPage() {
                         disabled={!productAvailable}
                         style={{ maxWidth: "100%" }}
                       >
-                        <FaDownload size={14} className="sm:w-4 sm:h-4 w-6" />
+                        <FaDownload
+                          size={14}
+                          className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0"
+                        />
                         DOWNLOAD SAMPLE
                       </button>
                       <button
@@ -862,7 +877,7 @@ export default function ProductDetailsPage() {
               )}
 
               {/* Special Combo */}
-              {comboPrices && (comboPrices.priceInr || comboPrices.priceUsd) && (
+              {comboPrices && (comboPrices.priceInr > 0 || comboPrices.priceUsd > 0) && (
                 <div
                   className={`px-2 sm:px-4 lg:px-6 py-2.5 sm:py-3 lg:py-3.5 bg-gradient-to-r from-orange-50 to-white ${
                     !productAvailable ? "opacity-70" : ""
@@ -898,9 +913,18 @@ export default function ProductDetailsPage() {
                       
                       {/* Discount Badge */}
                       {(comboPrices.mrpInr > comboPrices.priceInr ||
-                        comboPrices.mrpUsd > comboPrices.priceUsd) && (
+                        comboPrices.mrpUsd > comboPrices.priceUsd) &&
+                        calculateDiscount(
+                          comboPrices.mrpInr,
+                          comboPrices.priceInr,
+                        ) > 0 && (
                         <div className="inline-flex items-center text-[10px] sm:text-xs font-semibold text-green-600 bg-green-50 px-2.5 py-1 rounded-full border border-green-100 w-fit">
-                          Save {calculateDiscount(comboPrices.mrpInr, comboPrices.priceInr)}% Off!
+                          Save{" "}
+                          {calculateDiscount(
+                            comboPrices.mrpInr,
+                            comboPrices.priceInr,
+                          )}
+                          % Off!
                         </div>
                       )}
                     </div>
@@ -1039,7 +1063,11 @@ export default function ProductDetailsPage() {
         )}
       </div>
 
-      <RelatedProducts currentSlug={slug} maxProducts={10} />
+      <RelatedProducts
+        currentSlug={slug}
+        currentCategory={product?.category}
+        maxProducts={10}
+      />
 
       <Toaster />
     </div>

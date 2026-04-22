@@ -49,7 +49,7 @@ export default function Footer() {
             <h3 className="text-sm sm:text-base font-bold text-white mb-3 sm:mb-4 tracking-wide">
               About PrepMantras
             </h3>
-            <p className="text-xs sm:text-sm leading-relaxed text-gray-200">
+            <p className="text-xs sm:text-sm leading-relaxed text-white">
               At PrepMantras, our mission is simple — your exam success. We help
               students clear exams faster and smarter by providing 100%
               authentic, exam-focused questions designed to boost confidence and
@@ -63,7 +63,7 @@ export default function Footer() {
             <h3 className="text-sm sm:text-base font-bold text-white mb-3 sm:mb-4 tracking-wide">
               Popular Categories
             </h3>
-            <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm text-gray-200">
+            <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm text-white">
               {[
                 "SAP",
                 "AZURE",
@@ -88,7 +88,7 @@ export default function Footer() {
                     {cat}
                   </button>
                   {i < arr.length - 1 && (
-                    <span className="ml-2 sm:ml-3 text-gray-500">|</span>
+                    <span className="ml-2 sm:ml-3 text-white">|</span>
                   )}
                 </span>
               ))}
@@ -100,7 +100,7 @@ export default function Footer() {
             <h3 className="text-sm sm:text-base font-bold text-white mb-3 sm:mb-4 tracking-wide">
               Popular Links
             </h3>
-            <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-sm text-gray-200">
+            <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-sm text-white">
               <li>
                 <button
                   onClick={() => handleNavigation("/about")}
@@ -151,7 +151,7 @@ export default function Footer() {
             </h3>
             <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-5 flex-wrap">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/profile.php?id=61586933142451"
                 target="_blank"
                 rel="noopener noreferrer nofollow"
                 aria-label="Follow us on Facebook"
@@ -160,7 +160,7 @@ export default function Footer() {
                 <FaFacebookF className="text-white text-sm sm:text-base" />
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/prepmantras/"
                 target="_blank"
                 rel="noopener noreferrer nofollow"
                 aria-label="Follow us on LinkedIn"
@@ -169,7 +169,7 @@ export default function Footer() {
                 <FaLinkedinIn className="text-white text-sm sm:text-base" />
               </a>
               <a
-                href="https://youtube.com"
+                href="https://www.youtube.com/@Prepmantras"
                 target="_blank"
                 rel="noopener noreferrer nofollow"
                 aria-label="Subscribe to our YouTube channel"
@@ -178,7 +178,7 @@ export default function Footer() {
                 <FaYoutube className="text-white text-sm sm:text-base" />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/prepmantras/"
                 target="_blank"
                 rel="noopener noreferrer nofollow"
                 aria-label="Follow us on Instagram"
@@ -188,7 +188,7 @@ export default function Footer() {
               </a>
             </div>
             <div className="mt-4 sm:mt-5">
-              <p className="text-xs sm:text-sm text-gray-200 mb-2 sm:mb-3 font-semibold">
+              <p className="text-xs sm:text-sm text-white mb-2 sm:mb-3 font-semibold">
                 We Accept
               </p>
               <Image
@@ -205,7 +205,7 @@ export default function Footer() {
           <h3 className="text-xs sm:text-sm font-bold text-white mb-3 sm:mb-4 tracking-wide">
             Legal Disclaimer
           </h3>
-          <div className="space-y-2 sm:space-y-3 text-[11px] sm:text-xs lg:text-sm leading-relaxed text-gray-200">
+          <div className="space-y-2 sm:space-y-3 text-[11px] sm:text-xs lg:text-sm leading-relaxed text-white">
             <p>
               PrepMantras.com is an independent educational platform providing
               study materials and practice questions. We are not affiliated with
@@ -225,7 +225,7 @@ export default function Footer() {
 
         {/* Bottom Section */}
         <div className="border-t border-slate-800 pt-4 sm:pt-5 lg:pt-6">
-          <div className="flex flex-col gap-3 sm:gap-4 text-[11px] sm:text-xs lg:text-sm text-gray-200">
+          <div className="flex flex-col gap-3 sm:gap-4 text-[11px] sm:text-xs lg:text-sm text-white">
             <p className="leading-relaxed text-center sm:text-left">
               PrepMantras.com is an independent exam-preparation platform and is
               not affiliated with, endorsed by, or associated with SAP SE,
@@ -234,8 +234,8 @@ export default function Footer() {
               their respective owners and are used for identification purposes
               only.
             </p>
-            <p className="text-center pt-2 sm:pt-3 text-gray-300">
-              © 2025 PrepMantras.com. All rights reserved.
+            <p className="text-center pt-2 sm:pt-3 text-white">
+              © 2026 PrepMantras.com. All rights reserved.
             </p>
           </div>
         </div>

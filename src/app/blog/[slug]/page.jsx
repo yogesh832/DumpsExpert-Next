@@ -105,8 +105,11 @@ export async function generateMetadata({ params }) {
       };
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    const url = `${siteUrl}/blogs/${slug}`;
+    const siteUrl =
+      process.env.NEXT_PUBLIC_BASE_URL ||
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      "https://www.prepmantras.com";
+    const url = `${siteUrl.replace(/\/$/, "")}/blog/${slug}`;
     const imageUrl = blog.imageUrl || `${siteUrl}/default-blog.webp`;
 
     // Clean description from HTML

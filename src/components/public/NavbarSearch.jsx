@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { slugSegmentForUrl, categoryPathSegment } from "@/lib/productPaths";
 
 export default function NavbarSearch({ hideOnLarge = false }) {
   const [mounted, setMounted] = useState(false);
@@ -48,10 +49,11 @@ export default function NavbarSearch({ hideOnLarge = false }) {
   if (!mounted) return null;
   // 🟠 Product Card
   const ProductCard = ({ product }) => {
-    const slug = encodeURIComponent(product.slug || product.title);
+    const cat = categoryPathSegment(product.category);
+    const slug = slugSegmentForUrl(product.slug || product.title);
     return (
       <Link
-        href={`/itcertifications/${product.category}/${slug}`}
+        href={`/itcertifications/${cat}/${slug}`}
         className="group bg-white rounded-xl shadow-md overflow-hidden flex flex-col hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-orange-300"
       >
         <div className="relative h-48 bg-gradient-to-br from-orange-50 to-blue-50 overflow-hidden">

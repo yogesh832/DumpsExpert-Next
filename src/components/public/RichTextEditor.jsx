@@ -407,10 +407,25 @@ const RichTextEditor = ({ value, onChange, error = "", label = "Editor" }) => {
           defaultValue="p"
           onChange={(e) => {
             editorRef.current.focus();
-            if (e.target.value === "p") {
+            const v = e.target.value;
+            if (v === "p") {
               document.execCommand("formatBlock", false, "p");
             } else {
-              document.execCommand("formatBlock", false, `h${e.target.value}`);
+              const tag = `h${v}`;
+              const wrapped = `<${tag}>`;
+              let ok = false;
+              try {
+                ok = document.execCommand("formatBlock", false, tag);
+              } catch {
+                ok = false;
+              }
+              if (!ok) {
+                try {
+                  document.execCommand("formatBlock", false, wrapped);
+                } catch {
+                  /* ignore */
+                }
+              }
             }
             onChange(editorRef.current.innerHTML);
           }}

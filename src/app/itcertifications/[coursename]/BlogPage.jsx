@@ -40,7 +40,7 @@ const BlogPage = () => {
 
       try {
         const baseUrl =
-          process.env.NEXT_PUBLIC_BASE_URL || "https://prepmantras.com";
+          process.env.NEXT_PUBLIC_BASE_URL || "https://www.prepmantras.com";
 
         let normalizedBlogs = [];
 
