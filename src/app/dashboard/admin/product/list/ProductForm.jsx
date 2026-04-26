@@ -351,7 +351,7 @@ const ProductForm = ({ mode }) => {
               </label>
               <input
                 name="totalQuestions"
-                type="number"
+                type="text"
                 value={form.totalQuestions}
                 onChange={handleChange}
                 className="border border-gray-300 w-full px-4 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -400,8 +400,7 @@ const ProductForm = ({ mode }) => {
                 </label>
                 <input
                   name={field.name}
-                  type="number"
-                  step="0.01"
+                  type="text"
                   value={form[field.name]}
                   onChange={handleChange}
                   className="border border-gray-300 w-full px-4 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -429,8 +428,7 @@ const ProductForm = ({ mode }) => {
                 </label>
                 <input
                   name={field.name}
-                  type="number"
-                  step="0.01"
+                  type="text"
                   value={form[field.name]}
                   onChange={handleChange}
                   className="border border-gray-300 w-full px-4 py-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"

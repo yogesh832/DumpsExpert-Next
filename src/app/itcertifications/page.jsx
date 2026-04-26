@@ -298,7 +298,7 @@ export default async function itcertificationsPage() {
     <div className="min-h-screen w-full pt-16 sm:pt-20 md:pt-24 lg:pt-28 pb-10 sm:pb-12 md:pb-16 lg:pb-20 bg-white">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         {/* Header */}
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center text-gray-900 mb-4">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center text-gray-900 mb-1 sm:mb-2">
           IT Certifications Exam Dumps – Pass Your Certification on First
           Attempt
         </h1>
@@ -307,7 +307,7 @@ export default async function itcertificationsPage() {
         <div className="mb-6 sm:mb-8 px-4 sm:px-6 md:px-8">
           {itCertContent.upperPara ? (
             <div
-              className="text-gray-800 text-center text-sm sm:text-base md:text-lg leading-relaxed prose max-w-none prose-p:my-2 prose-strong:text-gray-900 prose-strong:font-bold"
+              className="text-gray-800 text-center text-sm sm:text-base md:text-lg leading-relaxed prose max-w-none prose-p:mt-0 prose-p:mb-2 prose-strong:text-gray-900 prose-strong:font-bold"
               dangerouslySetInnerHTML={{ __html: itCertContent.upperPara }}
             />
           ) : (

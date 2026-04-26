@@ -18,24 +18,7 @@ export default function ProductsList({ products, coursename }) {
   const productHref = (product) =>
     `/itcertifications/${coursename}/${slugSegmentForUrl(product.slug)}`;
 
-  const copyTableWithLinks = async () => {
-    if (typeof window === "undefined" || !products.length) return;
-    const origin = window.location.origin;
-    const lines = [
-      `Exam code\tName\tProduct URL`,
-      ...products.map((p) => {
-        const code = (p.sapExamCode || "").replace(/\t/g, " ");
-        const title = (p.title || "").replace(/\t|\r|\n/g, " ");
-        return `${code}\t${title}\t${origin}${productHref(p)}`;
-      }),
-    ];
-    try {
-      await navigator.clipboard.writeText(lines.join("\n"));
-      alert("Copied table with full URLs. Paste into Excel or Sheets.");
-    } catch {
-      alert("Could not copy. Select the table manually or try HTTPS.");
-    }
-  };
+
 
   useEffect(() => {
     setMounted(true);
@@ -166,15 +149,7 @@ export default function ProductsList({ products, coursename }) {
   // Desktop Table View
   return (
     <div className="overflow-x-auto shadow-md rounded-xl border border-gray-200 bg-white">
-      <div className="flex justify-end px-3 py-2 border-b border-gray-100 bg-gray-50">
-        <button
-          type="button"
-          onClick={copyTableWithLinks}
-          className="text-xs sm:text-sm font-semibold text-blue-700 hover:text-blue-900 underline"
-        >
-          Copy table (exam codes + full product links)
-        </button>
-      </div>
+
       <table className="min-w-full text-left text-gray-800 text-sm">
         <thead className="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 uppercase text-xs">
           <tr>

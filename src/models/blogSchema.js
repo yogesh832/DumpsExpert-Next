@@ -50,6 +50,7 @@ const blogSchema = new mongoose.Schema({
     default: '{}',
     validate: {
       validator: function(v) {
+        if (!v || v.trim() === '') return true;
         try {
           JSON.parse(v);
           return true;
