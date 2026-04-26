@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ItCertFaqs from "@/components/public/ItCertFaqs";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 // ✅ Enable ISR for better performance
 export const dynamic = "force-dynamic";
 export const revalidate = 0; // Real-time updates - no caching
